@@ -1,48 +1,43 @@
-# Tiny Chess Engine (v4)
+# Tiny Chess v4
 
-A compact, highly competitive 4 KB Python chess engine built for the make.fun tiny-chess competition. 
+Welcome to the repository for version 4 of our competitive 4 KB chess engine, crafted for the make.fun tiny-chess-01 competition. 
 
 ## Overview
 
-Version 4 represents a major algorithmic leap for the engine. The primary entry point, `main.py`, is a fully self-contained packed script measuring 4,072 bytes—comfortably within the strict 4,096-byte submission limit. Using a compression pipeline combining LZMA and Base85 encoding, the entire rule set, move generator, evaluation function, and search machinery are bundled into a single file with zero external dependencies.
+`main.py` serves as the sole entry point for the engine. It is a fully packed single-file script measuring exactly 4072 bytes—fitting securely beneath the rigorous 4096-byte size cap. Inside this compact footprint, an entire tournament-grade chess engine is compressed using lzma and base85 encoding, requiring zero external dependencies and running entirely on pure Python 3.
 
 ## How It Works
 
-At its core, v4 runs an optimized 200,000-node alpha-beta search enhanced with industry-standard chess programming heuristics:
+At the heart of v4 is a robust 200,000-node alpha-beta search algorithm equipped with advanced pruning and caching mechanisms:
 
-- **Late Move Reductions (LMR) & Re-search:** New in v4, LMR intelligently reduces the search depth for moves deemed less promising, successfully elevating the engine's peak effective search depth from 6 to 7 ply.
-- **Null-Move Pruning:** Dynamically skips turns in favorable positions to aggressively prune non-tactical subtrees.
-- **Transposition Table:** Caches previously evaluated board states using Zobrist hashing to eliminate redundant computations.
-- **History Heuristic:** Prioritizes quiet moves that have historically caused alpha-beta cutoffs.
-- **Quiescence Search:** Extends tactical evaluations past the horizon limit to resolve pending captures and prevent the horizon effect.
+- **Late Move Reductions (LMR) & Re-search:** Debuting in version 4, LMR intelligently prunes unpromising branches, successfully pushing the engine's peak effective search depth from 6 to 7 ply.
+- **Transposition Table & History Heuristic:** Caches previously visited board states to avoid duplicate work while dynamically prioritizing killer and history-favored moves.
+- **Null-Move Pruning:** Allows the search tree to skip turns in advantageous positions for faster convergence.
+- **Quiescence Search:** Extends tactical exploration past the horizon limit to stabilize evaluations during active captures.
 
-## Validation & Performance
+## Validation
 
-Rigorous local evaluations against the 8 house anchor engines demonstrate exceptional strength:
-
-- **Rating:** Elo 1497
-- **Match Score:** 9 wins, 1 draw, and 6 losses
-- **Progress:** Delivers a +67 Elo gain over v3 (Elo 1430) and an impressive +207 Elo improvement over the v1 baseline (Elo 1290).
+Tested locally against eight house anchor engines, v4 achieves an Elo rating of 1497 with a match record of 9 wins, 1 draw, and 6 losses. This marks a substantial +67 Elo gain over version 3 (Elo 1430) and a massive +207 Elo improvement over the original v1 baseline (Elo 1290).
 
 ## How to Run
 
-The engine reads a FEN or position string from standard input and outputs the chosen best move:
+The engine accepts a standard FEN position or board representation via standard input and outputs its calculated best move to standard output. 
 
 ```bash
 python3 main.py
 ```
 
-## Example
-
-To run the engine from the starting chess position, feed the standard starting FEN via standard input:
+### Example Usage
 
 ```bash
 echo "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" | python3 main.py
 ```
 
-Sample output:
-```text
-e2e4
-```
+## Design Notes
 
-Each move is chosen within a 200,000-node search budget, and the engine needs only Python 3 with no extra packages.
+Achieving version 4 within the strict 4096-byte budget required aggressive code optimization and architectural trade-offs to accommodate advanced search features without exceeding the limit. By ruthlessly pruning non-essential evaluations and redundancies, we freed up the necessary bytes to integrate Late Move Reductions and push search depth to 7 ply.
+
+- **Bishop-Pair Removal:** Dropped the bishop-pair bonus and its state tracking logic, trading a negligible Elo loss for critical byte savings.
+- **Dead Code Elimination:** Stripped out obsolete module-level initializers and unused boilerplate.
+- **Endgame Table Simplification:** Streamlined the endgame king evaluation table to maintain positional soundness while compressing code size.
+

@@ -1,43 +1,33 @@
-# Tiny Chess v4
+# Tiny Chess 01
 
-Welcome to the repository for version 4 of our competitive 4 KB chess engine, crafted for the make.fun tiny-chess-01 competition. 
+Tiny Chess 01 is a competition entry featuring a robust 4 KB Python chess engine designed to play intelligent chess under extremely strict size constraints. Contained entirely within `main.py` (4074 bytes packed), the engine communicates with local environment servers to compete against house opponents. Distributed under the MIT License, it demonstrates how advanced search algorithms and heuristic evaluations can be packed into a micro-footprint without sacrificing competitive performance.
 
-## Overview
+## How it Plays
 
-`main.py` serves as the sole entry point for the engine. It is a fully packed single-file script measuring exactly 4072 bytes—fitting securely beneath the rigorous 4096-byte size cap. Inside this compact footprint, an entire tournament-grade chess engine is compressed using lzma and base85 encoding, requiring zero external dependencies and running entirely on pure Python 3.
-
-## How It Works
-
-At the heart of v4 is a robust 200,000-node alpha-beta search algorithm equipped with advanced pruning and caching mechanisms:
-
-- **Late Move Reductions (LMR) & Re-search:** Debuting in version 4, LMR intelligently prunes unpromising branches, successfully pushing the engine's peak effective search depth from 6 to 7 ply.
-- **Transposition Table & History Heuristic:** Caches previously visited board states to avoid duplicate work while dynamically prioritizing killer and history-favored moves.
-- **Null-Move Pruning:** Allows the search tree to skip turns in advantageous positions for faster convergence.
-- **Quiescence Search:** Extends tactical exploration past the horizon limit to stabilize evaluations during active captures.
-
-## Validation
-
-Tested locally against eight house anchor engines, v4 achieves an Elo rating of 1497 with a match record of 9 wins, 1 draw, and 6 losses. This marks a substantial +67 Elo gain over version 3 (Elo 1430) and a massive +207 Elo improvement over the original v1 baseline (Elo 1290).
+The engine leverages a sophisticated suite of search and evaluation techniques:
+- **Search**: Iterative deepening alpha-beta search capped at 200,000 nodes per move. It incorporates null-move pruning, late move reductions (LMR) with re-search, a transposition table for memoization, and quiescence search to resolve tactical captures and avoid the horizon effect.
+- **Evaluation**: A balanced evaluation function combining material values, piece-square tables for positional understanding, and a small tempo bonus rewarding the side to move.
 
 ## How to Run
 
-The engine accepts a standard FEN position or board representation via standard input and outputs its calculated best move to standard output. 
+To run the engine and connect it to the local environment server, set the `MAKEFUN_ENV_URL` environment variable pointing to your server instance and execute `main.py`:
 
 ```bash
-python3 main.py
+export MAKEFUN_ENV_URL="http://localhost:8000"
+python main.py
 ```
 
-### Example Usage
+## Practice Results
 
-```bash
-echo "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" | python3 main.py
-```
+During local practice trials prior to submission, Tiny Chess 01 demonstrated consistent performance across matches:
+- **Trial-0**: 1530 Elo
+- **Trial-1**: 1564 Elo
+- **Pooled Average**: 1547 Elo (measured over 32 games)
 
-## Design Notes
+## Design Insights: Fitting Depth in 4 KB
 
-Achieving version 4 within the strict 4096-byte budget required aggressive code optimization and architectural trade-offs to accommodate advanced search features without exceeding the limit. By ruthlessly pruning non-essential evaluations and redundancies, we freed up the necessary bytes to integrate Late Move Reductions and push search depth to 7 ply.
+Building a competitive chess engine within a 4 KB budget requires strict minimalism in code structure and data representation. By stripping away external dependencies, utilizing Python's built-in data structures efficiently, and writing concise, functional evaluation heuristics, Tiny Chess 01 achieves tournament-level search depth while keeping the packed source code compact enough to fit comfortably in a single code block.
 
-- **Bishop-Pair Removal:** Dropped the bishop-pair bonus and its state tracking logic, trading a negligible Elo loss for critical byte savings.
-- **Dead Code Elimination:** Stripped out obsolete module-level initializers and unused boilerplate.
-- **Endgame Table Simplification:** Streamlined the endgame king evaluation table to maintain positional soundness while compressing code size.
+## Byte budget
 
+The competition caps the packed entry file at 4096 bytes, and this entry's `main.py` comes in at 4074 bytes packed, leaving 22 bytes to spare. The engine source is compressed using LZMA and encoded so that the entire program fits into just two lines. Maintaining a small buffer of spare bytes is essential during final tuning, as it allows for minor optimizations or bug fixes without inadvertently breaching the strict size limit.

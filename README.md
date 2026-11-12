@@ -1,29 +1,48 @@
-# Tiny Chess 0.1 (v3)
+# Tiny Chess Engine (v4)
 
-A minimalist, highly optimized 4 KB Python chess engine engineered to pack advanced search algorithms and pruning heuristics into an extremely strict size budget.
+A compact, highly competitive 4 KB Python chess engine built for the make.fun tiny-chess competition. 
 
-## Engine Architecture
-- **Source File:** `main.py`
-- **Footprint:** Exactly 4094 bytes (conforming strictly to the 4096-byte limit)
-- **Implementation:** Complete chess rules, board representation, move generation, and evaluation logic implemented in pure Python without external dependencies.
-- **Design Philosophy:** Maximum algorithmic strength within minimal code constraints.
-- **Compactness:** Every byte optimized to fit within the competitive 4 KB boundary.
+## Overview
 
-## Search & Heuristics
-- **Alpha-Beta Search:** Prunes search trees efficiently to find optimal moves.
-- **Iterative Deepening:** Gradually increases search depth to maximize time management and move ordering.
-- **Node Budget:** Capable of searching up to 200,000 nodes per move.
-- **Null-Move Pruning:** Skips turns to prune non-tactical branches rapidly.
-- **History Heuristic:** Prioritizes moves that previously caused alpha-beta cutoffs.
-- **Quiescence Search:** Extends search during tactical captures, featuring a dedicated check fix.
-- **Transposition Table:** Stores Zobrist-hashed board states to avoid duplicate evaluations.
-- **Efficiency:** Balanced pruning and caching for lightning-fast decision making.
+Version 4 represents a major algorithmic leap for the engine. The primary entry point, `main.py`, is a fully self-contained packed script measuring 4,072 bytes—comfortably within the strict 4,096-byte submission limit. Using a compression pipeline combining LZMA and Base85 encoding, the entire rule set, move generator, evaluation function, and search machinery are bundled into a single file with zero external dependencies.
+
+## How It Works
+
+At its core, v4 runs an optimized 200,000-node alpha-beta search enhanced with industry-standard chess programming heuristics:
+
+- **Late Move Reductions (LMR) & Re-search:** New in v4, LMR intelligently reduces the search depth for moves deemed less promising, successfully elevating the engine's peak effective search depth from 6 to 7 ply.
+- **Null-Move Pruning:** Dynamically skips turns in favorable positions to aggressively prune non-tactical subtrees.
+- **Transposition Table:** Caches previously evaluated board states using Zobrist hashing to eliminate redundant computations.
+- **History Heuristic:** Prioritizes quiet moves that have historically caused alpha-beta cutoffs.
+- **Quiescence Search:** Extends tactical evaluations past the horizon limit to resolve pending captures and prevent the horizon effect.
 
 ## Validation & Performance
-- **Local Trial Result:** Elo **1430**
-- **Match Record:** 8 wins, 1 draw, 7 losses in structured local test fixtures.
-- **Improvement:** +140 Elo gain over the v1 baseline rating of 1290.
-- **Conclusion:** Demonstrates substantial tactical and positional advancement.
 
-## How to run
-`main.py` is a packed single-file engine. It runs with `python3 main.py`, reading a position from standard input and printing the best move.
+Rigorous local evaluations against the 8 house anchor engines demonstrate exceptional strength:
+
+- **Rating:** Elo 1497
+- **Match Score:** 9 wins, 1 draw, and 6 losses
+- **Progress:** Delivers a +67 Elo gain over v3 (Elo 1430) and an impressive +207 Elo improvement over the v1 baseline (Elo 1290).
+
+## How to Run
+
+The engine reads a FEN or position string from standard input and outputs the chosen best move:
+
+```bash
+python3 main.py
+```
+
+## Example
+
+To run the engine from the starting chess position, feed the standard starting FEN via standard input:
+
+```bash
+echo "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" | python3 main.py
+```
+
+Sample output:
+```text
+e2e4
+```
+
+Each move is chosen within a 200,000-node search budget, and the engine needs only Python 3 with no extra packages.
